@@ -1,0 +1,13 @@
+close all; clear all;
+
+cd ~/Desktop/imageProcessingLessons/
+
+inputImage = imread('sunflower.jpeg');
+inputImageGray = double(rgb2gray(inputImage));
+
+bitPlane = 7;
+bitLevel = 2 ^ bitPlane;
+nextBitLevel 
+
+figure('Name', 'Original Image'); imshow(abs(inputImageGray), []);
+figure('Name', 'Contrast Stretched Image'); imshow(abs(contrastStretchedImage), []);
