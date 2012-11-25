@@ -1,0 +1,69 @@
+close all; clear all;
+
+cd ~/Desktop/imageProcessingLessons/
+
+inputImage = imread('sunflower.jpeg');
+inputImage = double(rgb2gray(inputImage));
+
+maxGrayLevel = 255;
+
+%% calculate input CDF
+
+inputCDF = zeros(maxGrayLevel + 1, 1);
+
+for k = 0:maxGrayLevel
+    logicalImage = (inputImage <= k);
+    numberOfElements = sum(logicalImage(:));
+    totalElements = numel(inputImage);
+    inputCDF(k + 1) = numberOfElements / totalElements;
+end
+
+quantizedInputCDF = round(inputCDF * maxGrayLevel);
+
+
+%% calculate target CDF
+
+targetCDF = (1:(maxGrayLevel + 1))' ./ (maxGrayLevel + 1);
+
+quantizedTargetCDF = round(targetCDF * maxGrayLevel);
+
+
+%% get target CDF to target gray level map
+
+targetGrayLevel = zeros(maxGrayLevel + 1, 1);
+
+m = 0; n = 0;
+for k = 0:maxGrayLevel
+    m = n;
+    if m > maxGrayLevel
+        m = maxGrayLevel;
+    end
+    
+    for j = m:maxGrayLevel
+        n = n + 1;
+        if (quantizedTargetCDF(j + 1) - quantizedInputCDF(k + 1)) >= 0
+            targetGrayLevel(k + 1) = j;
+            break;
+        end
+    end
+end
+
+%% get histogram equalized image
+
+histogramEqualizedImage = quantizedInputCDF(inputImage + 1);
+
+
+%% get histogram matched image
+
+histogramMatchedImage = targetGrayLevel(histogramEqualizedImage + 1);
+
+
+%% print the images on screen
+
+figure('Name', 'Histogram Equalized Image'); imshow(abs(histogramEqualizedImage), []);
+
+figure('Name', 'Histogram Matched Image'); imshow(abs(histogramMatchedImage), []);
+
+figure('Name', 'Histogram of Equalized Image'); hist(histogramEqualizedImage, 256);
+
+figure('Name', 'Histogram of Matched Image'); hist(histogramMatchedImage, 256);
